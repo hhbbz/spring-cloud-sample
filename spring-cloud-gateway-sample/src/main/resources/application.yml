@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:10111/eureka/
+
+spring:
+  application:
+    name: spring-cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true
+      routes:
+      #id：固定，不同 id 对应不同的功能，可参考 官方文档
+      #uri：目标服务地址
+      #predicates：路由条件
+      #filters：过滤规则
+      - id: baidu_route
+        uri: http://www.baidu.com/
+        predicates:
+        - Path=/baidu
+
+      - id: demo_service_route
+        uri: lb://demo-service
+        predicates:
+        - Path=/demo-service/**
+#        filters:
+#        - RewritePath=/service-feign/(?<path>.*), /$\{path}
+        filters:
+        - StripPrefix=1  #忽略前缀
+
+      - id: user_service_route
+        uri: lb://user-service
+        predicates:
+        - Path=/user-service/**
+        filters:
+        - StripPrefix=1  #忽略前缀
+
+      - id: decision_system_route
+        uri: lb://decision-system
+        predicates:
+        - Path=/decision-system/**
+        filters:
+        - StripPrefix=1  #忽略前缀
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG

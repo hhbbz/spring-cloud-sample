@@ -1,0 +1,50 @@
+server:
+  port: 7090
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:10111/eureka/
+
+spring:
+  application:
+    name: decision-system
+
+
+feign:
+  hystrix:
+    enabled: true
+  okhttp:
+    enable: true
+  httpclient:
+    enable: false
+  client:
+    config:
+      feignName:
+        connectTimeout: 30000
+        readTimeout: 30000
+  ribbon:
+    ReadTimeout: 15000
+    ConnectTimeout: 15000
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 500  #并发执行的最大线程数，默认10
+  command:
+    paas-file:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3600000
+    default:
+      execution:
+        timeout:
+           enabled: false
+        isolation:
+          strategy: SEMAPHORE #信号量模式，方便获取当前请求线程的token
+          thread:
+            interruptOnTimeout : false
+            timeoutInMilliseconds: 60000  #命令执行超时时间，默认1000ms
+#      circuitBreaker:
+#       sleepWindowInMilliseconds: 50000     #触发短路的时间值，当该值设为5000时，则当触发circuit break后的5000毫秒内都会拒绝request，也就是5000毫秒后才会关闭circuit。默认5000
